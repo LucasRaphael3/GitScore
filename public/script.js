@@ -158,7 +158,10 @@ usernameInput.addEventListener('blur', () => {
     }, 200);
 });
 
-// --- FIM DA NOVA LÓGICA DE SUGESTÕES ---
+function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('hidden');
+}
 
 function displayData(data) {
     ui.avatar.src = data.avatar_url;
@@ -183,4 +186,5 @@ function getScoreColor(score) {
     if (score >= 8.0) return 'var(--score-good)';
     if (score >= 6.0) return 'var(--score-medium)';
     return 'var(--score-bad)';
+
 }
