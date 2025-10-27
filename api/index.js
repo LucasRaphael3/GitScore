@@ -11,8 +11,6 @@ const httpsAgent = new https.Agent({
 });
 
 const app = express();
-const ratingsPath = path.join(__dirname, 'player_ratings.json');
-const playerRatings = JSON.parse(fs.readFileSync('player_ratings.json', 'utf-8'));
 
 app.use(cors());
 
@@ -271,5 +269,6 @@ app.get('/api/image-proxy', async (req, res) => {
         res.status(500).send('Falha ao buscar imagem');
     }
 });
+
 
 module.exports = app;
