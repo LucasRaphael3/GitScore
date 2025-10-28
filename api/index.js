@@ -271,4 +271,6 @@ app.get('/api/image-proxy', async (req, res) => {
 });
 
 
-module.exports = app;
+module.exports = (req, res) => {
+  app(req, res);
+};
