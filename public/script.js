@@ -44,7 +44,7 @@ searchForm.addEventListener('submit', async (e) => {
     loadingIndicator.classList.remove('hidden');
 
     try {
-        const response = await fetch(`http://localhost:3000/api/stats/${username}`);
+        const response = await fetch(`/api/stats/${username}`);
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Erro ao buscar usuário');
@@ -84,7 +84,7 @@ usernameInput.addEventListener('input', () => {
 // 2. Busca as sugestões no nosso novo backend
 async function fetchSuggestions(query) {
     try {
-        const response = await fetch(`http://localhost:3000/api/search/${query}`);
+        const response = await fetch(`/api/search/${query}`);
         if (!response.ok) return; // Falha silenciosamente
 
         const suggestions = await response.json();
@@ -189,4 +189,5 @@ function getScoreColor(score) {
     if (score >= 8.0) return 'var(--score-good)';
     if (score >= 6.0) return 'var(--score-medium)';
     return 'var(--score-bad)';
+
 }
