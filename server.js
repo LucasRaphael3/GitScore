@@ -18,7 +18,7 @@ app.use(cors());
 const githubApi = axios.create({
     baseURL: 'https://api.github.com/',
     headers: {
-        'Authorization': `token ${process.GITHUB_TOKEN}`
+        'Authorization': `token ${process.env.GITHUB_TOKEN}`
     }
 });
 
@@ -41,13 +41,11 @@ query($username: String!) {
 }
 `;
 
-// --- NOVO: Objeto de Easter Eggs ---
 // Imagens de perfil (URLs estáveis da Wikimedia)
 const messiAvatar = "https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg";
 const ronaldoAvatar = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg";
 
 const easterEggs = {
-    // Normalizamos tudo para minúsculas
     'messi': {
         username: 'messi',
         avatar_url: messiAvatar,
@@ -60,7 +58,6 @@ const easterEggs = {
         activeDays: 365,
         yearsOnGitHub: '20.0', // Anos de carreira
         finalScore: '10.0',
-
     },
     'cristiano ronaldo': {
         username: 'cristiano',
@@ -101,6 +98,7 @@ app.get('/api/stats/:username', async (req, res) => {
         // Retorna o perfil fake imediatamente e para a execução
         return res.json(easterEggs[username]);
     }
+    // --- FIM DA VERIFICAÇÃO ---
     
     // Se não for um Easter Egg, o código continua normalmente
     try {
@@ -108,7 +106,6 @@ app.get('/api/stats/:username', async (req, res) => {
         const userResponse = await githubApi.get(`/users/${username}`);
         const { followers, public_repos, created_at } = userResponse.data;
 
-        // --- CHAMADA 2: Repositórios (para Estrelas) (REST) ---
         let allRepos = [];
         let page = 1;
         let reposResponse;
@@ -163,8 +160,6 @@ app.get('/api/stats/:username', async (req, res) => {
             (scoreTenure * 0.15)
         ).toFixed(1);
 
-        const sofascoreMatch = getMatchingPlayer(finalScore);
-
         res.json({
             username: userResponse.data.login,
             avatar_url: userResponse.data.avatar_url,
@@ -177,7 +172,6 @@ app.get('/api/stats/:username', async (req, res) => {
             activeDays,
             yearsOnGitHub: yearsOnGitHub.toFixed(1),
             finalScore: finalScore,
-            sofascoreMatch: sofascoreMatch
         });
 
     } catch (error) {
@@ -222,6 +216,4 @@ app.get('/api/search/:query', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Servidor backend rodando em http://localhost:${port}`);
-
 });
-
