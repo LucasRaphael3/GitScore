@@ -11,7 +11,6 @@ const httpsAgent = new https.Agent({
 
 const app = express();
 const port = 3000;
-const playerRatings = JSON.parse(fs.readFileSync('player_ratings.json', 'utf-8'));
 
 app.use(cors());
 
@@ -19,7 +18,7 @@ app.use(cors());
 const githubApi = axios.create({
     baseURL: 'https://api.github.com/',
     headers: {
-        'Authorization': `token ${process.env.GITHUB_TOKEN}`
+        'Authorization': `token ${process.GITHUB_TOKEN}`
     }
 });
 
@@ -273,4 +272,5 @@ app.get('/api/image-proxy', async (req, res) => {
 
 app.listen(port, () => {
     console.log(`Servidor backend rodando em http://localhost:${port}`);
+
 });
