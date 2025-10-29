@@ -41,23 +41,6 @@ query($username: String!) {
 }
 `;
 
-function getMatchingPlayer(score) {
-    if (!score) return null;
-    
-    // Arredonda a nota para 1 casa decimal, ex: "8.1"
-    const scoreKey = parseFloat(score).toFixed(1); 
-
-    // Busca no nosso JSON
-    const matchingPlayers = playerRatings[scoreKey];
-    
-    if (matchingPlayers && matchingPlayers.length > 0) {
-        // Se achou, retorna um jogador aleatório da lista
-        return matchingPlayers[Math.floor(Math.random() * matchingPlayers.length)];
-    }
-    
-    return null; // Não achou ninguém com essa nota
-}
-
 // --- NOVO: Objeto de Easter Eggs ---
 // Imagens de perfil (URLs estáveis da Wikimedia)
 const messiAvatar = "https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg";
@@ -77,7 +60,7 @@ const easterEggs = {
         activeDays: 365,
         yearsOnGitHub: '20.0', // Anos de carreira
         finalScore: '10.0',
-        sofascoreMatch: getMatchingPlayer('10.0')
+
     },
     'cristiano ronaldo': {
         username: 'cristiano',
@@ -91,7 +74,6 @@ const easterEggs = {
         activeDays: 365,
         yearsOnGitHub: '22.0', // Anos de carreira
         finalScore: '10.0',
-        sofascoreMatch: getMatchingPlayer('10.0')
     },
     // Bônus: adicionar apelidos comuns
     'cr7': {
@@ -106,7 +88,6 @@ const easterEggs = {
         activeDays: 365,
         yearsOnGitHub: '22.0',
         finalScore: '10.0',
-        sofascoreMatch: getMatchingPlayer('10.0')
     }
 };
 
@@ -120,7 +101,6 @@ app.get('/api/stats/:username', async (req, res) => {
         // Retorna o perfil fake imediatamente e para a execução
         return res.json(easterEggs[username]);
     }
-    // --- FIM DA VERIFICAÇÃO ---
     
     // Se não for um Easter Egg, o código continua normalmente
     try {
@@ -128,7 +108,6 @@ app.get('/api/stats/:username', async (req, res) => {
         const userResponse = await githubApi.get(`/users/${username}`);
         const { followers, public_repos, created_at } = userResponse.data;
 
-        // ... (O RESTANTE DO SEU CÓDIGO PERMANECE IDÊNTICO) ...
         // --- CHAMADA 2: Repositórios (para Estrelas) (REST) ---
         let allRepos = [];
         let page = 1;
@@ -164,7 +143,7 @@ app.get('/api/stats/:username', async (req, res) => {
             });
         });
         
-        // --- O NOVO ALGORITMO "GITSCORE" v2 ---
+        // --- ALGORITMO GITSCORE v2 ---
         const createdDate = new Date(created_at);
         const today = new Date();
         const yearsOnGitHub = (today - createdDate) / (1000 * 60 * 60 * 24 * 365.25);
@@ -241,36 +220,8 @@ app.get('/api/search/:query', async (req, res) => {
     }
 });
 
-app.get('/api/image-proxy', async (req, res) => {
-    // Decodifica a URL que o frontend nos enviou
-    const imageUrl = decodeURIComponent(req.query.url);
-
-    if (!imageUrl) {
-        return res.status(400).send('URL da imagem não fornecida');
-    }
-
-    try {
-        const response = await axios({
-            method: 'get',
-            url: imageUrl,
-            responseType: 'stream',
-            
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            },
-            httpsAgent: httpsAgent
-        });
-
-        res.setHeader('Content-Type', response.headers['content-type']);
-        response.data.pipe(res);
-
-    } catch (error) {
-        console.error('Erro no proxy de imagem:', error.message, 'URL:', imageUrl);
-        res.status(500).send('Falha ao buscar imagem');
-    }
-});
-
 app.listen(port, () => {
     console.log(`Servidor backend rodando em http://localhost:${port}`);
 
 });
+
